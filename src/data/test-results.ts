@@ -1,9 +1,9 @@
 
-import { TestResult } from "@/types/architecture";
+import { TestResult, ArchitecturePattern } from "@/types/architecture";
 import { architecturePatterns } from "./architecture-patterns";
 
 // Function to generate realistic metrics for each architecture pattern
-function generatePatternMetrics(patternId: string) {
+function generatePatternMetrics(patternId: string, parameters?: any) {
   // Base values that make sense for each architecture
   const baseMetrics = {
     monolithic: {
@@ -32,16 +32,19 @@ function generatePatternMetrics(patternId: string) {
     }
   };
 
+  // Apply load level factor if provided in parameters
+  const loadFactor = parameters?.loadLevel ? parameters.loadLevel / 50 : 1;
+  
   // Add some randomness to make it more realistic (+/- 10%)
   const randomFactor = () => 0.9 + Math.random() * 0.2;
   
   const base = baseMetrics[patternId as keyof typeof baseMetrics];
   
   return {
-    throughput: Math.round(base.throughput * randomFactor()),
-    latency: Math.round(base.latency * randomFactor()),
-    availability: Number((base.availability * randomFactor()).toFixed(1)),
-    resourceUtilization: Math.round(base.resourceUtilization * randomFactor()),
+    throughput: Math.round(base.throughput * randomFactor() * loadFactor),
+    latency: Math.round(base.latency * randomFactor() * (2 - loadFactor/2)),
+    availability: Number((base.availability * (0.98 + (randomFactor() * 0.02))).toFixed(1)),
+    resourceUtilization: Math.round(base.resourceUtilization * randomFactor() * loadFactor),
     faultTolerance: Math.min(10, Math.round(base.faultTolerance * randomFactor())),
     elasticity: Math.min(10, Math.round(base.elasticity * randomFactor())),
     costEfficiency: Math.min(10, Math.round(base.costEfficiency * randomFactor())),
@@ -49,15 +52,52 @@ function generatePatternMetrics(patternId: string) {
   };
 }
 
-export function generateTestResult(url: string): TestResult {
-  // Create pattern metrics for all patterns
-  const allPatterns = architecturePatterns.map(pattern => ({
-    pattern,
-    metrics: generatePatternMetrics(pattern.id)
-  }));
+export function generateTestResult(url: string, parameters?: any): TestResult {
+  // Determine which patterns to include in the analysis
+  const patternsToTest = parameters?.selectedPatterns && parameters.selectedPatterns.length > 0
+    ? parameters.selectedPatterns
+    : ['monolithic', 'microservices', 'serverless', 'eventdriven', 'soa', 'p2p'];
+  
+  // Create pattern metrics only for the selected patterns
+  const allPatterns = architecturePatterns
+    .filter(pattern => patternsToTest.includes(pattern.id))
+    .map(pattern => ({
+      pattern,
+      metrics: generatePatternMetrics(pattern.id, parameters)
+    }));
 
-  // Find the best pattern (let's say it's microservices for this example)
-  const bestPattern = architecturePatterns.find(p => p.id === "microservices")!;
+  // Find the best pattern by scoring each one
+  const scoredPatterns = allPatterns.map(patternData => {
+    const { metrics } = patternData;
+    
+    // Calculate score based on weighted metrics
+    // Higher values are better for all except latency and resource utilization
+    let score = 0;
+    score += metrics.throughput / 1000 * 2; // Weight throughput higher
+    score += (500 - metrics.latency) / 100; // Lower latency is better
+    score += metrics.availability - 95; // Availability percentage points above 95%
+    score += (100 - metrics.resourceUtilization) / 10; // Lower resource utilization is better
+    score += metrics.faultTolerance;
+    score += metrics.elasticity;
+    score += metrics.costEfficiency;
+    score += metrics.dataConsistency;
+    
+    // Apply test type adjustments
+    if (parameters?.testType === 'api') {
+      score += metrics.throughput / 500; // Boost throughput importance for APIs
+    } else if (parameters?.testType === 'database') {
+      score += metrics.dataConsistency * 1.5; // Data consistency is more important for databases
+    }
+    
+    return {
+      ...patternData,
+      score
+    };
+  });
+  
+  // Sort by score and get the best pattern
+  scoredPatterns.sort((a, b) => b.score - a.score);
+  const bestPattern = scoredPatterns[0].pattern;
   
   // Generate before/after metrics for demonstration
   const beforeScaling = {
@@ -71,7 +111,7 @@ export function generateTestResult(url: string): TestResult {
     dataConsistency: 8
   };
   
-  const afterScaling = generatePatternMetrics("microservices");
+  const afterScaling = generatePatternMetrics(bestPattern.id, parameters);
   
   // Calculate improvement percentages
   const improvementPercentages = {
@@ -101,7 +141,7 @@ export function generateTestResult(url: string): TestResult {
 
 // Generate some test results for demo purposes
 export const sampleTestResults: TestResult[] = [
-  generateTestResult("https://example.com"),
-  generateTestResult("https://test-api.example.org"),
-  generateTestResult("https://ai-model-service.example.net")
+  generateTestResult("https://example.com", {selectedPatterns: ['monolithic', 'microservices', 'serverless']}),
+  generateTestResult("https://test-api.example.org", {testType: 'api', selectedPatterns: ['microservices', 'serverless', 'eventdriven']}),
+  generateTestResult("https://ai-model-service.example.net", {testType: 'api', selectedPatterns: ['serverless', 'eventdriven']})
 ];

@@ -14,7 +14,7 @@ const TestPage = () => {
           <div className="flex flex-col items-center justify-center text-center mb-10">
             <h1 className="text-3xl font-bold tracking-tight">Architecture Pattern Analysis</h1>
             <p className="mt-4 text-muted-foreground max-w-2xl">
-              Enter an application URL below to run a comprehensive analysis of how different architecture patterns would perform for your application's scaling needs.
+              Run a comprehensive analysis of how different architecture patterns would perform for your application's scaling needs.
             </p>
           </div>
           
@@ -28,9 +28,9 @@ const TestPage = () => {
                 <div className="bg-primary/10 p-3 rounded-full mb-4">
                   <span className="text-2xl font-bold text-primary">1</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">Input Application URL</h3>
+                <h3 className="text-lg font-medium mb-2">Enter Application Details</h3>
                 <p className="text-sm text-muted-foreground">
-                  Provide the URL of your application or API endpoint to analyze.
+                  Provide the URL and configuration details for your application or API.
                 </p>
               </div>
               
@@ -38,9 +38,9 @@ const TestPage = () => {
                 <div className="bg-primary/10 p-3 rounded-full mb-4">
                   <span className="text-2xl font-bold text-primary">2</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">Architecture Analysis</h3>
+                <h3 className="text-lg font-medium mb-2">AI Architecture Analysis</h3>
                 <p className="text-sm text-muted-foreground">
-                  Our system evaluates multiple architecture patterns against your application.
+                  Our AI system evaluates multiple architecture patterns using advanced LLM analysis.
                 </p>
               </div>
               
@@ -48,9 +48,9 @@ const TestPage = () => {
                 <div className="bg-primary/10 p-3 rounded-full mb-4">
                   <span className="text-2xl font-bold text-primary">3</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">Review Results</h3>
+                <h3 className="text-lg font-medium mb-2">Review Recommendations</h3>
                 <p className="text-sm text-muted-foreground">
-                  Get detailed metrics and recommendations for optimal architecture patterns.
+                  Get detailed metrics and implementation guidance for the optimal architecture pattern.
                 </p>
               </div>
             </div>

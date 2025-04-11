@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cpu, Activity, Server, Database, BarChart2, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { architecturePatterns } from '@/data/architecture-patterns';
@@ -17,89 +16,57 @@ const Index = () => {
       <Header />
       
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-background to-secondary/20 py-16 md:py-24">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-              <div className="space-y-4">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-                  Software Architecture Patterns for AI Models at Scale
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  Analyze and compare different architecture patterns for deploying AI models at scale. Determine the most suitable pattern for your application.
+        {/* Hero Section - Simplified */}
+        <section className="bg-gradient-to-b from-background to-secondary/20 py-16">
+          <div className="container px-4 md:px-6 max-w-5xl mx-auto">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-6">
+                AI Architecture Pattern Analysis
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Find the optimal architecture pattern for your AI application with data-driven analysis and recommendations.
+              </p>
+              <Button size="lg" onClick={() => navigate('/test')} className="mb-4">
+                Run Architecture Analysis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-card rounded-lg border p-6">
+                <h2 className="text-xl font-semibold mb-4">Analyze Architecture Patterns</h2>
+                <p className="text-muted-foreground mb-4">
+                  Test your application against multiple architecture patterns to determine the optimal solution for your scaling needs.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" onClick={() => navigate('/test')}>
-                    Run Architecture Analysis
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  <Button size="lg" variant="outline" onClick={() => navigate('/documentation')}>
-                    Learn More
-                  </Button>
-                </div>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Performance metrics comparison</li>
+                  <li>Scalability assessment</li>
+                  <li>Resource utilization analysis</li>
+                </ul>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <Cpu className="h-12 w-12 text-primary mb-2" />
-                    <CardTitle>Performance Analysis</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Measure throughput, latency, and resource utilization across different patterns.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <Activity className="h-12 w-12 text-primary mb-2" />
-                    <CardTitle>Scalability Testing</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Evaluate how well each architecture scales under increased load.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <Server className="h-12 w-12 text-primary mb-2" />
-                    <CardTitle>Pattern Comparison</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Compare multiple architecture patterns side-by-side with detailed metrics.
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <Database className="h-12 w-12 text-primary mb-2" />
-                    <CardTitle>Deployment Optimization</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Get recommendations for optimizing your AI model deployment.
-                    </p>
-                  </CardContent>
-                </Card>
+              
+              <div className="bg-card rounded-lg border p-6">
+                <h2 className="text-xl font-semibold mb-4">AI-Powered Recommendations</h2>
+                <p className="text-muted-foreground mb-4">
+                  Get intelligent recommendations based on your application's unique requirements and performance characteristics.
+                </p>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Best pattern selection</li>
+                  <li>Before/after performance comparison</li>
+                  <li>Detailed implementation guidance</li>
+                </ul>
               </div>
             </div>
           </div>
         </section>
         
-        {/* Architecture Patterns Section */}
-        <section className="py-16">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center text-center mb-10">
-              <h2 className="text-3xl font-bold tracking-tight">Supported Architecture Patterns</h2>
-              <p className="mt-4 text-muted-foreground">
-                Our analyzer evaluates applications against these industry-standard architecture patterns for AI deployment.
-              </p>
-            </div>
+        {/* Pattern Overview - Simplified */}
+        <section className="py-16 bg-muted/50">
+          <div className="container px-4 md:px-6 max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-8">Supported Architecture Patterns</h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {architecturePatterns.map((pattern) => (
+              {architecturePatterns.slice(0, 3).map((pattern) => (
                 <ArchitecturePatternCard 
                   key={pattern.id} 
                   pattern={pattern} 
@@ -107,10 +74,9 @@ const Index = () => {
               ))}
             </div>
             
-            <div className="mt-12 text-center">
-              <Button size="lg" onClick={() => navigate('/test')}>
-                Start Architecture Analysis
-                <BarChart2 className="ml-2 h-4 w-4" />
+            <div className="mt-8 text-center">
+              <Button variant="outline" onClick={() => navigate('/documentation')} className="mx-auto">
+                View All Architecture Patterns
               </Button>
             </div>
           </div>
