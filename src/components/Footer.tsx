@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GitHub, BookOpen, Code } from 'lucide-react';
+import { Github, BookOpen, Code } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -18,7 +18,7 @@ const Footer = () => {
             rel="noreferrer"
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
-            <GitHub className="h-4 w-4" />
+            <Github className="h-4 w-4" />
             <span>GitHub</span>
           </a>
           <a 
