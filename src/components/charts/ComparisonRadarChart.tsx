@@ -51,7 +51,6 @@ const ComparisonRadarChart: React.FC<ComparisonRadarChartProps> = ({ data }) => 
 
   return (
     <div className="w-full h-96">
-      <h3 className="text-lg font-medium mb-2">Multi-Metric Comparison</h3>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={radarData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <PolarGrid stroke="rgba(148, 163, 184, 0.2)" />

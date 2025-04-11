@@ -5,18 +5,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Globe, Code, Database, Server } from 'lucide-react';
+import { Loader2, Globe } from 'lucide-react';
 import { generateTestResult } from '@/data/test-results';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
 const TestInputForm: React.FC = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [testType, setTestType] = useState('standard');
-  const [apiEndpoint, setApiEndpoint] = useState('');
   const [loadLevel, setLoadLevel] = useState(50);
   const [selectedPatterns, setSelectedPatterns] = useState<string[]>(['microservices', 'serverless', 'eventdriven']);
   const { toast } = useToast();
@@ -25,12 +21,10 @@ const TestInputForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const targetUrl = testType === 'standard' ? url : apiEndpoint;
-    
-    if (!targetUrl) {
+    if (!url) {
       toast({
         title: "URL is required",
-        description: `Please enter a ${testType === 'standard' ? 'website' : 'API endpoint'} URL to analyze.`,
+        description: "Please enter a website URL to analyze.",
         variant: "destructive"
       });
       return;
@@ -38,7 +32,7 @@ const TestInputForm: React.FC = () => {
     
     // Validate URL format
     try {
-      new URL(targetUrl);
+      new URL(url);
     } catch (error) {
       toast({
         title: "Invalid URL",
@@ -50,11 +44,10 @@ const TestInputForm: React.FC = () => {
     
     setLoading(true);
     
-    // Pass test parameters to the result generator
-    setTimeout(() => {
-      // Generate test results with the provided URL and parameters
-      const testResult = generateTestResult(targetUrl, {
-        testType,
+    try {
+      // This would ideally call the Supabase edge function
+      // For now we'll use the generated test results
+      const testResult = generateTestResult(url, {
         loadLevel,
         selectedPatterns,
       });
@@ -68,7 +61,14 @@ const TestInputForm: React.FC = () => {
       
       setLoading(false);
       navigate('/results');
-    }, 3000);
+    } catch (error) {
+      toast({
+        title: "Analysis failed",
+        description: "There was an error analyzing the architecture. Please try again.",
+        variant: "destructive"
+      });
+      setLoading(false);
+    }
   };
 
   const handlePatternToggle = (patternId: string) => {
@@ -88,166 +88,114 @@ const TestInputForm: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="standard" onValueChange={setTestType}>
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="standard" className="flex items-center">
-              <Globe className="mr-2 h-4 w-4" />
-              Website Test
-            </TabsTrigger>
-            <TabsTrigger value="api" className="flex items-center">
-              <Code className="mr-2 h-4 w-4" />
-              API Endpoint
-            </TabsTrigger>
-            <TabsTrigger value="database" className="flex items-center">
-              <Database className="mr-2 h-4 w-4" />
-              Database Perf
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="url">Website URL</Label>
+            <div className="flex items-center space-x-2">
+              <Globe className="h-4 w-4 text-muted-foreground" />
+              <Input
+                id="url"
+                type="text"
+                placeholder="https://example.com"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">Enter the URL of your web application to test.</p>
+          </div>
           
-          <TabsContent value="standard">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="url">Website URL</Label>
-                <Input
-                  id="url"
-                  type="text"
-                  placeholder="https://example.com"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+          <div className="space-y-2">
+            <Label>Test Load Level</Label>
+            <div className="pt-4">
+              <Slider
+                value={[loadLevel]}
+                min={10}
+                max={100}
+                step={10}
+                onValueChange={(vals) => setLoadLevel(vals[0])}
+                disabled={loading}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Minimal</span>
+              <span>Moderate</span>
+              <span>Intensive</span>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Architecture Patterns to Test</Label>
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-microservices"
+                  checked={selectedPatterns.includes('microservices')}
+                  onChange={() => handlePatternToggle('microservices')}
+                  className="h-4 w-4 rounded border-gray-300"
                   disabled={loading}
                 />
-                <p className="text-sm text-muted-foreground">Enter the URL of your web application to test.</p>
+                <Label htmlFor="pattern-microservices" className="text-sm">Microservices</Label>
               </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="api">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="apiEndpoint">API Endpoint</Label>
-                <Input
-                  id="apiEndpoint"
-                  type="text"
-                  placeholder="https://api.example.com/data"
-                  value={apiEndpoint}
-                  onChange={(e) => setApiEndpoint(e.target.value)}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-serverless"
+                  checked={selectedPatterns.includes('serverless')}
+                  onChange={() => handlePatternToggle('serverless')}
+                  className="h-4 w-4 rounded border-gray-300"
                   disabled={loading}
                 />
-                <p className="text-sm text-muted-foreground">Enter the URL of your API endpoint to test.</p>
+                <Label htmlFor="pattern-serverless" className="text-sm">Serverless</Label>
               </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="database">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="apiEndpoint">Database API URL</Label>
-                <Input
-                  id="apiEndpoint"
-                  type="text"
-                  placeholder="https://db.example.com/api"
-                  value={apiEndpoint}
-                  onChange={(e) => setApiEndpoint(e.target.value)}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-eventdriven"
+                  checked={selectedPatterns.includes('eventdriven')}
+                  onChange={() => handlePatternToggle('eventdriven')}
+                  className="h-4 w-4 rounded border-gray-300"
                   disabled={loading}
                 />
-                <p className="text-sm text-muted-foreground">Enter the URL of your database API to test.</p>
+                <Label htmlFor="pattern-eventdriven" className="text-sm">Event-Driven</Label>
               </div>
-            </div>
-          </TabsContent>
-          
-          <div className="mt-6 space-y-6">
-            <div className="space-y-2">
-              <Label>Test Load Level</Label>
-              <div className="pt-4">
-                <Slider
-                  value={[loadLevel]}
-                  min={10}
-                  max={100}
-                  step={10}
-                  onValueChange={(vals) => setLoadLevel(vals[0])}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-monolithic"
+                  checked={selectedPatterns.includes('monolithic')}
+                  onChange={() => handlePatternToggle('monolithic')}
+                  className="h-4 w-4 rounded border-gray-300"
                   disabled={loading}
                 />
+                <Label htmlFor="pattern-monolithic" className="text-sm">Monolithic</Label>
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Minimal</span>
-                <span>Moderate</span>
-                <span>Intensive</span>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-soa"
+                  checked={selectedPatterns.includes('soa')}
+                  onChange={() => handlePatternToggle('soa')}
+                  className="h-4 w-4 rounded border-gray-300"
+                  disabled={loading}
+                />
+                <Label htmlFor="pattern-soa" className="text-sm">SOA</Label>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Architecture Patterns to Test</Label>
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-microservices"
-                    checked={selectedPatterns.includes('microservices')}
-                    onChange={() => handlePatternToggle('microservices')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-microservices" className="text-sm">Microservices</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-serverless"
-                    checked={selectedPatterns.includes('serverless')}
-                    onChange={() => handlePatternToggle('serverless')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-serverless" className="text-sm">Serverless</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-eventdriven"
-                    checked={selectedPatterns.includes('eventdriven')}
-                    onChange={() => handlePatternToggle('eventdriven')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-eventdriven" className="text-sm">Event-Driven</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-monolithic"
-                    checked={selectedPatterns.includes('monolithic')}
-                    onChange={() => handlePatternToggle('monolithic')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-monolithic" className="text-sm">Monolithic</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-soa"
-                    checked={selectedPatterns.includes('soa')}
-                    onChange={() => handlePatternToggle('soa')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-soa" className="text-sm">SOA</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="pattern-p2p"
-                    checked={selectedPatterns.includes('p2p')}
-                    onChange={() => handlePatternToggle('p2p')}
-                    className="h-4 w-4 rounded border-gray-300"
-                    disabled={loading}
-                  />
-                  <Label htmlFor="pattern-p2p" className="text-sm">P2P</Label>
-                </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pattern-p2p"
+                  checked={selectedPatterns.includes('p2p')}
+                  onChange={() => handlePatternToggle('p2p')}
+                  className="h-4 w-4 rounded border-gray-300"
+                  disabled={loading}
+                />
+                <Label htmlFor="pattern-p2p" className="text-sm">P2P</Label>
               </div>
             </div>
           </div>
-        </Tabs>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button

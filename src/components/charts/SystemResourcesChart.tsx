@@ -56,48 +56,84 @@ const generateResourceData = (baseUtilization: number, patternId: string) => {
 };
 
 const SystemResourcesChart: React.FC<SystemResourcesChartProps> = ({ data }) => {
-  const pattern = data[0]?.pattern;
-  if (!pattern) return null;
+  // If multiple patterns are selected, show comparison
+  const multiplePatterns = data.length > 1;
   
-  const resourceData = generateResourceData(data[0].metrics.resourceUtilization, pattern.id);
-
   return (
     <div className="w-full h-80">
-      <h3 className="text-lg font-medium mb-2">Resource Utilization Over Time ({pattern.name})</h3>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={resourceData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="time" />
-          <YAxis label={{ value: 'Utilization (%)', angle: -90, position: 'insideLeft' }} />
-          <Tooltip />
-          <Legend />
-          
-          <Area 
-            type="monotone" 
-            dataKey="CPU" 
-            stackId="1"
-            stroke="#8884d8" 
-            fill="#8884d8" 
-            fillOpacity={0.5}
-          />
-          <Area 
-            type="monotone" 
-            dataKey="Memory" 
-            stackId="1"
-            stroke="#82ca9d" 
-            fill="#82ca9d" 
-            fillOpacity={0.5}
-          />
-          <Area 
-            type="monotone" 
-            dataKey="Network" 
-            stackId="1"
-            stroke="#ffc658" 
-            fill="#ffc658" 
-            fillOpacity={0.5}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {multiplePatterns ? (
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="time" />
+            <YAxis label={{ value: 'CPU Utilization (%)', angle: -90, position: 'insideLeft' }} />
+            <Tooltip />
+            <Legend />
+            
+            {data.map((patternData, index) => {
+              const resourceData = generateResourceData(
+                patternData.metrics.resourceUtilization, 
+                patternData.pattern.id
+              );
+              
+              return (
+                <Area 
+                  key={patternData.pattern.id}
+                  type="monotone" 
+                  data={resourceData}
+                  dataKey="CPU" 
+                  name={`${patternData.pattern.name} CPU`}
+                  stroke={patternData.pattern.color} 
+                  fill={patternData.pattern.color} 
+                  fillOpacity={0.3}
+                />
+              );
+            })}
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : (
+        // Single pattern view (original)
+        <>
+          <h3 className="text-lg font-medium mb-2">Resource Utilization Over Time ({data[0]?.pattern.name})</h3>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart 
+              data={generateResourceData(data[0]?.metrics.resourceUtilization, data[0]?.pattern.id)} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis label={{ value: 'Utilization (%)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip />
+              <Legend />
+              
+              <Area 
+                type="monotone" 
+                dataKey="CPU" 
+                stackId="1"
+                stroke="#8884d8" 
+                fill="#8884d8" 
+                fillOpacity={0.5}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="Memory" 
+                stackId="1"
+                stroke="#82ca9d" 
+                fill="#82ca9d" 
+                fillOpacity={0.5}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="Network" 
+                stackId="1"
+                stroke="#ffc658" 
+                fill="#ffc658" 
+                fillOpacity={0.5}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </>
+      )}
     </div>
   );
 };

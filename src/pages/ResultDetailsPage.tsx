@@ -21,24 +21,27 @@ import SystemResourcesChart from '@/components/charts/SystemResourcesChart';
 
 const ResultDetailsPage = () => {
   const [testResult, setTestResult] = useState<TestResult | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Get the selected test result from sessionStorage if it exists
     const resultJson = sessionStorage.getItem('selectedTestResult');
     
-    if (resultJson) {
-      try {
+    try {
+      if (resultJson) {
         const result = JSON.parse(resultJson) as TestResult;
         setTestResult(result);
-      } catch (error) {
-        console.error('Error parsing test result:', error);
-        // Fallback to a generated result
+      } else {
+        // Fallback to a generated result if none is selected
         setTestResult(generateTestResult('https://example.com'));
       }
-    } else {
-      // Fallback to a generated result if none is selected
+    } catch (error) {
+      console.error('Error parsing test result:', error);
+      // Fallback to a generated result
       setTestResult(generateTestResult('https://example.com'));
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -80,13 +83,25 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
     URL.revokeObjectURL(url);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+        <Header />
+        <main className="flex-1 py-12 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (!testResult) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
         <Header />
         <main className="flex-1 py-12 flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4">Loading result data...</h2>
+            <h2 className="text-xl font-semibold mb-4">No result data found</h2>
             <Button onClick={() => navigate('/results')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Results
@@ -99,18 +114,18 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <Header />
       
       <main className="flex-1 py-8">
-        <div className="container px-4 md:px-6">
+        <div className="container px-4 md:px-6 max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
               <Button variant="ghost" onClick={() => navigate('/results')} className="mb-2">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Results
               </Button>
-              <h1 className="text-3xl font-bold">Architecture Analysis Details</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Architecture Analysis Details</h1>
               <div className="flex items-center mt-2">
                 <ExternalLink className="h-4 w-4 mr-2 opacity-70" />
                 <a 
@@ -134,21 +149,23 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
           </div>
           
           <div className="grid gap-6 mb-8">
-            <Card>
+            <Card className="border-t-4" style={{ borderTopColor: testResult.bestPattern.color }}>
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle>Best Architecture Pattern</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      Best Architecture Pattern
+                      <Badge 
+                        className="ml-auto" 
+                        style={{ backgroundColor: testResult.bestPattern.color }}
+                      >
+                        Recommended
+                      </Badge>
+                    </CardTitle>
                     <CardDescription>
                       Based on the analysis, this pattern is most suitable for your application
                     </CardDescription>
                   </div>
-                  <Badge 
-                    className="ml-auto" 
-                    style={{ backgroundColor: testResult.bestPattern.color }}
-                  >
-                    Recommended
-                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -165,14 +182,12 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
             </Card>
           </div>
           
-          <Tabs defaultValue="comparison">
-            <div className="mb-6">
-              <TabsList className="w-full sm:w-auto">
-                <TabsTrigger value="comparison">Pattern Comparison</TabsTrigger>
-                <TabsTrigger value="metrics">Detailed Metrics</TabsTrigger>
-                <TabsTrigger value="charts">Performance Charts</TabsTrigger>
-              </TabsList>
-            </div>
+          <Tabs defaultValue="comparison" className="space-y-6">
+            <TabsList className="w-full sm:w-auto flex justify-center sm:inline-flex">
+              <TabsTrigger value="comparison">Pattern Comparison</TabsTrigger>
+              <TabsTrigger value="metrics">Metrics Detail</TabsTrigger>
+              <TabsTrigger value="charts">Performance Charts</TabsTrigger>
+            </TabsList>
             
             <TabsContent value="comparison" className="mt-0">
               <Card>
@@ -189,9 +204,9 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
             </TabsContent>
             
             <TabsContent value="metrics" className="mt-0">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {testResult.allPatterns.map((patternMetrics, index) => (
-                  <Card key={index}>
+                  <Card key={index} className={patternMetrics.pattern.id === testResult.bestPattern.id ? 'border-2' : ''} style={{ borderColor: patternMetrics.pattern.id === testResult.bestPattern.id ? patternMetrics.pattern.color : '' }}>
                     <CardHeader className="pb-3">
                       <CardTitle 
                         className="flex items-center" 
@@ -345,11 +360,11 @@ ${Object.entries(testResult.comparisonResult.beforeScaling)
                   <CardHeader>
                     <CardTitle>System Resources Utilization</CardTitle>
                     <CardDescription>
-                      Resource usage over time for {testResult.bestPattern.name}
+                      Resource usage comparison across architecture patterns
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <SystemResourcesChart data={[testResult.allPatterns.find(p => p.pattern.id === testResult.bestPattern.id)!]} />
+                    <SystemResourcesChart data={testResult.allPatterns} />
                   </CardContent>
                 </Card>
               </div>
