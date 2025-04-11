@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -45,8 +44,7 @@ const TestInputForm: React.FC = () => {
     setLoading(true);
     
     try {
-      // This would ideally call the Supabase edge function
-      // For now we'll use the generated test results
+      // Use local test result generation
       const testResult = generateTestResult(url, {
         loadLevel,
         selectedPatterns,
