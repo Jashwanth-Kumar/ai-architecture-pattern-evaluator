@@ -1,73 +1,102 @@
-# Welcome to your Lovable project
 
-## Project info
+# Architecture Pattern Analyzer for AI Models
 
-**URL**: https://lovable.dev/projects/a64428f1-7557-47a8-b95e-11012051245f
+## Project Overview
 
-## How can I edit this code?
+This application allows users to analyze and compare different software architecture patterns for deploying and managing generative AI models at scale. It evaluates various metrics across different architectural approaches and provides recommendations for optimal deployment strategies.
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+- **Pattern Analysis**: Evaluate application performance across six different architecture patterns
+- **Comprehensive Metrics**: Compare patterns using throughput, latency, availability, resource utilization, and more
+- **Visual Comparisons**: Interactive charts and graphs for easy metric comparison
+- **Before/After Analysis**: Compare performance before and after implementing recommended patterns
+- **Detailed Reports**: Generate and download detailed analysis reports
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a64428f1-7557-47a8-b95e-11012051245f) and start prompting.
+## Architecture Patterns Evaluated
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Monolithic Architecture**
+2. **Microservices Architecture**
+3. **Serverless Architecture**
+4. **Event-Driven Architecture**
+5. **Peer-to-Peer Architecture**
+6. **Service-Oriented Architecture (SOA)**
 
-**Use your preferred IDE**
+## Metrics Measured
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Throughput**: Number of requests processed per second
+- **Latency**: Response time in milliseconds
+- **Availability**: System uptime percentage
+- **Resource Utilization**: CPU and memory usage
+- **Fault Tolerance**: Ability to handle failures
+- **Elasticity**: Ability to scale with demand
+- **Cost Efficiency**: Resource utilization vs. performance
+- **Data Consistency**: Consistency across distributed systems
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## How It Works
 
-Follow these steps:
+1. Input your application URL for analysis
+2. The system evaluates how each architecture pattern would perform with your application
+3. Detailed metrics are calculated for each pattern
+4. The system determines the optimal architecture pattern for your specific needs
+5. Results are presented with comprehensive visualizations and comparisons
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Technical Implementation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+This application is built using:
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **React**: Frontend UI framework
+- **TypeScript**: For type-safe code
+- **Recharts**: For data visualization
+- **Tailwind CSS**: For styling
+- **Shadcn UI**: Component library
+- **React Router**: For navigation
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+In a production environment, this application would integrate with:
+- Load testing tools (JMeter, Locust)
+- Monitoring systems (Prometheus, Grafana)
+- Cloud provider APIs (AWS, Azure, GCP)
+
+## Getting Started
+
+```bash
+# Clone the repository
+git clone <repository-url>
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Future Enhancements
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Integration with real load testing frameworks
+- Machine learning-based pattern recommendations
+- Custom metric weightings for specific use cases
+- Hybrid pattern recommendations
+- Integration with cloud provider cost calculators
 
-**Use GitHub Codespaces**
+## Resources and References
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Academic Resources
+- Richards, M. (2015). *Software Architecture Patterns*. O'Reilly Media.
+- Fowler, M. (2002). *Patterns of Enterprise Application Architecture*. Addison-Wesley.
+- Newman, S. (2021). *Building Microservices* (2nd ed.). O'Reilly Media.
 
-## What technologies are used for this project?
+### Online Resources
+- [AWS Architecture Center](https://aws.amazon.com/architecture/)
+- [Microsoft Azure Architecture Center](https://learn.microsoft.com/en-us/azure/architecture/)
+- [Google Cloud Architecture Center](https://cloud.google.com/architecture)
+- [Hugging Face Inference Endpoints Architecture](https://huggingface.co/docs/inference-endpoints/architectural_overview)
 
-This project is built with:
+### Tools and Technologies
+- [Apache JMeter](https://jmeter.apache.org/)
+- [Prometheus](https://prometheus.io/)
+- [Grafana](https://grafana.com/)
+- [Kubernetes](https://kubernetes.io/)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## License
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/a64428f1-7557-47a8-b95e-11012051245f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License - see the LICENSE file for details.

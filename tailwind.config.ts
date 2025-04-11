@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Custom colors for architectural patterns
+				monolithic: "#4f46e5",
+				microservices: "#0891b2", 
+				serverless: "#9333ea",
+				eventdriven: "#16a34a",
+				p2p: "#f59e0b",
+				soa: "#ef4444"
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
