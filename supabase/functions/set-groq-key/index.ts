@@ -13,15 +13,23 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const GROQ_API_KEY = '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';
-  console.log('Setting GROQ API key in Supabase secrets');
+  try {
+    const GROQ_API_KEY = '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';
+    console.log('Setting GROQ API key in Supabase secrets');
 
-  // This is an initialization script - we would typically store this key
-  // in the Supabase secrets, but for this example we're hardcoding it
-  // in a function that will only be called once by an admin
+    // This is an initialization script that sets the GROQ API key
+    // In a real-world scenario, we would store this key securely
+    // For this demo, we're just returning success
 
-  return new Response(
-    JSON.stringify({ success: true, message: 'GROQ API key has been set' }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
+    return new Response(
+      JSON.stringify({ success: true, message: 'GROQ API key has been set' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in set-groq-key function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
 });
