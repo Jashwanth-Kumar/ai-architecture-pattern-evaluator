@@ -5,10 +5,22 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArchitecturePattern, TestResult } from '@/types/architecture';
-import { ExternalLink, BarChart2 } from 'lucide-react';
+import { ExternalLink, BarChart2, Trash2 } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface TestResultCardProps {
   result: TestResult;
+  onRemove?: () => void;
 }
 
 const formatDate = (isoString: string) => {
@@ -16,7 +28,7 @@ const formatDate = (isoString: string) => {
   return date.toLocaleString();
 };
 
-const TestResultCard: React.FC<TestResultCardProps> = ({ result }) => {
+const TestResultCard: React.FC<TestResultCardProps> = ({ result, onRemove }) => {
   const navigate = useNavigate();
   
   const handleViewDetails = () => {
@@ -33,12 +45,36 @@ const TestResultCard: React.FC<TestResultCardProps> = ({ result }) => {
             <CardTitle className="text-lg font-semibold">Test Result</CardTitle>
             <CardDescription>{formatDate(result.timestamp)}</CardDescription>
           </div>
-          <Badge 
-            className="ml-auto" 
-            style={{ backgroundColor: result.bestPattern.color }}
-          >
-            {result.bestPattern.name}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge 
+              className="ml-auto" 
+              style={{ backgroundColor: result.bestPattern.color }}
+            >
+              {result.bestPattern.name}
+            </Badge>
+            
+            {onRemove && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-100">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove Test Result</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to remove this test result? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onRemove} className="bg-red-500 hover:bg-red-600">Remove</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { TestResult } from '@/types/architecture';
 import { sampleTestResults } from '@/data/test-results';
+import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
 
 const ResultsPage = () => {
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -32,6 +34,20 @@ const ResultsPage = () => {
       setTestResults(sampleTestResults);
     }
   }, []);
+
+  // Add function to remove a test result
+  const handleRemoveResult = (index: number) => {
+    const updatedResults = [...testResults];
+    updatedResults.splice(index, 1);
+    setTestResults(updatedResults);
+    
+    // Remove from session storage if it's the first item
+    if (index === 0 && sessionStorage.getItem('latestTestResult')) {
+      sessionStorage.removeItem('latestTestResult');
+    }
+    
+    toast.success("Test result removed successfully");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -61,7 +77,11 @@ const ResultsPage = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {testResults.map((result, index) => (
-                <TestResultCard key={index} result={result} />
+                <TestResultCard 
+                  key={index} 
+                  result={result}
+                  onRemove={() => handleRemoveResult(index)}
+                />
               ))}
             </div>
           )}
