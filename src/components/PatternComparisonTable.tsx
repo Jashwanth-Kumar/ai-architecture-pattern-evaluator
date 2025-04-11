@@ -11,7 +11,7 @@ interface PatternComparisonTableProps {
 const PatternComparisonTable: React.FC<PatternComparisonTableProps> = ({ data }) => {
   // Find the best value for each metric
   const bestValues = metrics.reduce((acc, metric) => {
-    const key = metric.key as keyof typeof data[0].metrics;
+    const key = metric.key as keyof typeof data[0]['metrics'];
     // For latency and resource utilization, lower is better
     if (key === 'latency' || key === 'resourceUtilization') {
       acc[key] = Math.min(...data.map(item => item.metrics[key] as number));
